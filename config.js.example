@@ -1,0 +1,5 @@
+global.owner = [
+    ['393xxxxxxxxx', 'owner', true] // inserisci il tuo numero e il tuo nome
+]
+
+global.prefix = ['.'] // inserisci il prefisso che preferisci

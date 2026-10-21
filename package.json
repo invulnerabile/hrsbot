@@ -1,0 +1,26 @@
+{
+  "name": "hrsbot",
+  "version": "0.1.0-beta.1",
+  "description": "A WhatsApp bot built with JavaScript and Baileys",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "whatsapp-bot",
+    "baileys",
+    "javascript",
+    "whatsapp"
+  ],
+  "author": "",
+  "license": "UNLICENSED",
+  "type": "module",
+  "dependencies": {
+    "@itsliaaa/baileys": "^0.3.18-final",
+    "cfonts": "^3.3.1",
+    "dotenv": "^18.0.8",
+    "lowdb": "^7.0.1",
+    "pino": "^10.4.0",
+    "qrcode-terminal": "^0.12.0"
+  }
+}

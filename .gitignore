@@ -1,0 +1,6 @@
+node_modules/
+session/
+temp/
+tmp/
+config.js
+database.json
