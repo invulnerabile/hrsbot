@@ -1,0 +1,8 @@
+node_modules/
+session/
+temp/
+tmp/
+config.js
+database.json
+plugins/owner/raid.js
+lib/telegram.js
