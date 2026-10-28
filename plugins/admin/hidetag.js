@@ -35,7 +35,7 @@ const handler = async (m, { conn, args }) => {
 handler.help = ['tag'];
 handler.tags = ['admin'];
 handler.command = ['tag', 'hidetag'];
-handler.admin = true;
 handler.group = true;
+handler.mod = true;
 
 export default handler;

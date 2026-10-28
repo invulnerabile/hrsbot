@@ -10,6 +10,7 @@ const LABELS = {
   info: '𝐈𝐍𝐅𝐎',
   generale: '𝐆𝐄𝐍𝐄𝐑𝐀𝐋𝐄',
   funzioni: '𝐅𝐔𝐍𝐙𝐈𝐎𝐍𝐈',
+  mod: '𝐌𝐎𝐃',
 }
 
 function groupByFolder() {
@@ -25,7 +26,11 @@ function groupByFolder() {
 
 const handler = async (m, { conn, args, isOwner }) => {
   const groups = groupByFolder();
-  const order = ['info', 'admin', 'funzioni', 'generale', 'owner']
+  const modCommands = (global.plugins || [])
+    .filter((p) => p.mod && p.help)
+    .map((p) => p.help[0])
+  if (modCommands.length) groups.mod = modCommands
+  const order = ['info', 'admin', 'funzioni', 'generale', 'owner', 'mod']
   const folders = [...order.filter((f) => groups[f]), ...Object.keys(groups).filter((f) => !order.includes(f))]
     .filter((f) => f !== 'owner' || isOwner);
 

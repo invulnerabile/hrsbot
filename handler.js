@@ -60,7 +60,9 @@ export async function handler(sock, msg) {
   if (!plugin) return
 
   if (plugin.group && !m.isGroup) {
-    return m.reply('𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐟𝐮𝐧𝐳𝐢𝐨𝐧𝐚 𝐬𝐨𝐥𝐨 𝐧𝐞𝐢 𝐠𝐫𝐮𝐩𝐩𝐢.')
+    return m.reply(
+      '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐟𝐮𝐧𝐳𝐢𝐨𝐧𝐚 𝐬𝐨𝐥𝐨 𝐧𝐞𝐢 𝐠𝐫𝐮𝐩𝐩𝐢.'
+    )
   }
 
   if (plugin.owner && !isOwner) {
@@ -87,7 +89,11 @@ export async function handler(sock, msg) {
     }
   }
 
-  const senderParticipant = findGroupParticipant(permissionMeta, m.sender)
+  const senderParticipant = findGroupParticipant(
+    permissionMeta,
+    m.sender
+  )
+
   const isGroupAdmin = Boolean(senderParticipant?.admin)
 
   const botParticipant = findGroupParticipant(
@@ -98,6 +104,26 @@ export async function handler(sock, msg) {
   const isBotAdminNow = Boolean(botParticipant?.admin)
 
   const isPrivileged = isOwner || isAlwaysAdmin || isGroupAdmin
+
+  const chatModerators =
+    global.db?.data?.chats?.[m.chat]?.moderators || []
+
+  const isGlobalMod = (global.mods || []).some(
+    (number) => senderId === String(number)
+  )
+
+  const isChatMod = chatModerators.some((id) =>
+    sameGroupParticipant(permissionMeta, id, m.sender)
+  )
+
+  // Inizializzazione prima di qualsiasi controllo plugin.mod.
+  const isMod = isPrivileged || isGlobalMod || isChatMod
+
+  if (plugin.mod && !isMod) {
+    return m.reply(
+      '𝐂𝐨𝐦𝐚𝐧𝐝𝐨 𝐫𝐢𝐬𝐞𝐫𝐯𝐚𝐭𝐨 𝐚𝐢 𝐦𝐨𝐝𝐞𝐫𝐚𝐭𝐨𝐫𝐢.'
+    )
+  }
 
   if (m.isGroup && !isPrivileged) {
     const mutedUsers =
@@ -115,7 +141,9 @@ export async function handler(sock, msg) {
   }
 
   if (plugin.admin && !isPrivileged) {
-    return m.reply('𝐂𝐨𝐦𝐚𝐧𝐝𝐨 𝐫𝐢𝐬𝐞𝐫𝐯𝐚𝐭𝐨 𝐚𝐠𝐥𝐢 𝐚𝐝𝐦𝐢𝐧 𝐝𝐞𝐥 𝐠𝐫𝐮𝐩𝐩𝐨.')
+    return m.reply(
+      '𝐂𝐨𝐦𝐚𝐧𝐝𝐨 𝐫𝐢𝐬𝐞𝐫𝐯𝐚𝐭𝐨 𝐚𝐢 𝐦𝐨𝐝𝐞𝐫𝐚𝐭𝐨𝐫𝐢 𝐝𝐞𝐥 𝐠𝐫𝐮𝐩𝐩𝐨.'
+    )
   }
 
   if (plugin.botAdmin && !isBotAdminNow) {
@@ -129,7 +157,8 @@ export async function handler(sock, msg) {
     args,
     usedPrefix: PREFIX,
     isOwner,
-    isAlwaysAdmin
+    isAlwaysAdmin,
+    isMod
   }
 
   try {
