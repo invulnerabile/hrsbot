@@ -2,80 +2,83 @@
 
 # HrsBot.
 
-### A WhatsApp bot, powered by JavaScript.
-
 [![JavaScript](https://img.shields.io/badge/JavaScript-747FA8?style=for-the-badge&logo=javascript&logoColor=F4F3F0&labelColor=303342)](https://developer.mozilla.org/docs/Web/JavaScript)
 [![Node.js](https://img.shields.io/badge/Node.js-747FA8?style=for-the-badge&logo=nodedotjs&logoColor=F4F3F0&labelColor=303342)](https://nodejs.org/)
-[![Status](https://img.shields.io/badge/STATUS-BETA-747FA8?style=for-the-badge&labelColor=303342)](#stato-del-progetto)
+[![Beta](https://img.shields.io/badge/STATUS-BETA-747FA8?style=for-the-badge&labelColor=303342)](#stato-del-progetto)
 
-[Website](https://github.com/invulnerabile/hrsbot) · [GitHub Repository](https://github.com/invulnerabile/hrsbot)
+[Repository GitHub](https://github.com/invulnerabile/hrsbot) · [Libreria Baileys](https://www.npmjs.com/package/@itsliaaa/baileys)
 
 </div>
 
 ---
 
-## 01. Introduzione
+## Indice
 
-**HrsBot** è un bot WhatsApp sviluppato in JavaScript e basato sulla libreria [Baileys](https://www.npmjs.com/package/@itsliaaa/baileys).
+- [Panoramica](#panoramica)
+- [Funzionalità](#funzionalità)
+- [Requisiti](#requisiti)
+- [Installazione](#installazione)
+- [Configurazione](#configurazione)
+- [Collegamento a WhatsApp](#collegamento-a-whatsapp)
+- [Avvio e arresto](#avvio-e-arresto)
+- [Struttura del progetto](#struttura-del-progetto)
+- [Architettura](#architettura)
+- [Dati locali e sicurezza](#dati-locali-e-sicurezza)
+- [Risoluzione dei problemi](#risoluzione-dei-problemi)
+- [Stato del progetto](#stato-del-progetto)
+- [Licenza](#licenza)
 
-Il progetto utilizza un'architettura modulare basata su plugin, progettata per mantenere le funzionalità organizzate e facilitare lo sviluppo e la manutenzione del codice.
+## Panoramica
 
-> HrsBot è attualmente in fase beta. Il progetto è in evoluzione e alcune funzionalità potrebbero subire modifiche.
+**HrsBot** è un bot WhatsApp scritto in JavaScript e basato su [`@itsliaaa/baileys`](https://www.npmjs.com/package/@itsliaaa/baileys).
 
-## 02. Caratteristiche
+Il progetto organizza le funzionalità attraverso plugin JavaScript caricati dalla cartella `plugins/`. È pensato per essere esteso e modificato durante lo sviluppo.
 
-- **Architettura modulare** — funzionalità organizzate in plugin indipendenti.
-- **Caricamento dinamico** — i plugin vengono caricati dalle rispettive cartelle.
-- **Plugin hot reload** — le modifiche ai plugin possono essere rilevate durante l'esecuzione.
-- **Connessione flessibile** — collegamento a WhatsApp tramite QR code o codice numerico.
-- **Configurazione locale** — le impostazioni personali sono separate dal codice sorgente.
+> [!WARNING]
+> HrsBot è in beta. Il comportamento, le funzionalità e le dipendenze possono cambiare; non considerarlo software stabile o pronto per ambienti di produzione.
 
-## 03. Requisiti
+## Funzionalità
 
-Per eseguire HrsBot sono necessari:
+- **Architettura a plugin:** le funzionalità sono separate in moduli JavaScript.
+- **Caricamento ricorsivo:** il bot cerca i plugin nelle sottocartelle di `plugins/`.
+- **Ricaricamento dei plugin:** il processo monitora le modifiche ai file JavaScript dei plugin.
+- **Collegamento WhatsApp:** al primo avvio è possibile usare un QR code o un codice di collegamento.
+- **Persistenza locale:** sessione e dati del bot sono conservati nella cartella del progetto.
 
-- [Node.js](https://nodejs.org/)
+Le funzionalità effettivamente disponibili dipendono dai plugin presenti nella versione installata.
+
+## Requisiti
+
+- Node.js 20 o superiore
 - npm
-- [Git](https://git-scm.com/)
-- Un account WhatsApp da collegare.
+- Git
+- Un account WhatsApp che sei autorizzato a collegare
 
-Si consiglia di utilizzare una versione di Node.js compatibile con le dipendenze del progetto.
+Link utili: [Node.js](https://nodejs.org/) · [Git](https://git-scm.com/)
 
-## 04. Installazione
+## Installazione
 
-Clona il repository:
+Clona il repository e installa le dipendenze:
 
 ```bash
 git clone https://github.com/invulnerabile/hrsbot.git
-```
-
-Entra nella cartella:
-
-```bash
 cd hrsbot
-```
-
-Installa le dipendenze:
-
-```bash
 npm install
 ```
 
-## 05. Configurazione
-
-Crea il file `config.js` utilizzando il modello `config.js.example`.
-
-Su Linux e macOS:
+Crea il file di configurazione locale partendo dal modello incluso:
 
 ```bash
 cp config.js.example config.js
 ```
 
-Su Windows, copia il file `config.js.example` e rinomina la copia in `config.js`.
+Su Windows, copia `config.js.example` e rinomina la copia in `config.js`.
 
-Apri `config.js` e configura almeno il proprietario e il prefisso dei comandi, seguendo la struttura prevista dal modello.
+## Configurazione
 
-Esempio indicativo:
+Apri `config.js` e imposta il proprietario del bot e il prefisso dei comandi. Il file `config.js.example` contiene il modello da seguire.
+
+Esempio:
 
 ```js
 global.owner = [
@@ -85,130 +88,112 @@ global.owner = [
 global.prefix = ['.'];
 ```
 
-Sostituisci il numero di esempio con il tuo numero, comprensivo di prefisso internazionale e senza simboli o spazi.
+Sostituisci `39XXXXXXXXXX` con il numero corretto, comprensivo di prefisso internazionale e senza `+`, spazi o simboli. Puoi personalizzare il prefisso nell'array `global.prefix`.
 
-**Attenzione:** `config.js` contiene impostazioni personali. Non pubblicarlo e non condividere credenziali o dati sensibili.
+**Non pubblicare `config.js`.** Mantieni nel repository soltanto il modello privo di credenziali personali.
 
-## 06. Avvio
+## Collegamento a WhatsApp
 
-Avvia il bot:
+Al primo avvio, se non è presente una sessione salvata, HrsBot chiede quale metodo di collegamento utilizzare.
+
+### QR code
+
+1. Seleziona `1` nel terminale.
+2. Apri WhatsApp e vai su **Dispositivi collegati → Collega un dispositivo**.
+3. Scansiona il QR code mostrato nel terminale.
+
+### Codice di collegamento
+
+1. Seleziona `2` nel terminale.
+2. Inserisci il numero con prefisso internazionale, utilizzando solo le cifre.
+3. Segui le istruzioni mostrate nel terminale e completa il collegamento da WhatsApp.
+
+Tratta QR code e codici di collegamento come credenziali: non condividerli con altre persone.
+
+## Avvio e arresto
+
+Dalla cartella del progetto, avvia il bot con:
 
 ```bash
 npm start
 ```
 
-Al primo avvio, se non è presente una sessione salvata, sarà possibile scegliere il metodo di collegamento.
+Lo script `start` esegue `index.js`, che avvia il processo principale del bot. Per arrestarlo, usa `Ctrl + C` nel terminale.
 
-### QR Code
-
-1. Seleziona l'opzione `1`.
-2. Apri WhatsApp.
-3. Vai su **Dispositivi collegati**.
-4. Seleziona **Collega un dispositivo**.
-5. Scansiona il QR code mostrato nel terminale.
-
-### Codice di collegamento
-
-1. Seleziona l'opzione `2`.
-2. Inserisci il numero di telefono con prefisso internazionale.
-3. Segui le istruzioni mostrate nel terminale.
-4. Inserisci il codice nella procedura di collegamento di WhatsApp.
-
-Dopo il primo collegamento, la sessione viene salvata localmente e potrà essere riutilizzata ai successivi avvii.
-
-Per arrestare il bot, utilizza `Ctrl + C` nel terminale.
-
-## 07. Struttura del progetto
-
-La struttura principale è organizzata in questo modo:
+## Struttura del progetto
 
 ```text
 hrsbot/
-├── lib/
-│   └── ...
-├── plugins/
-│   └── ...
-├── config.js.example
-├── handler.js
-├── hrs.js
-├── package.json
-├── package-lock.json
+├── lib/                  # Moduli di supporto
+├── plugins/              # Plugin e funzionalità
+├── banner.js             # Banner iniziale
+├── config.js.example     # Modello di configurazione
+├── handler.js            # Gestione dei messaggi
+├── hrs.js                # Connessione e ciclo del bot
+├── index.js              # Avvio del processo
+├── package.json          # Dipendenze e script
+├── package-lock.json     # Versioni delle dipendenze installate
 └── README.md
 ```
 
-| Percorso | Descrizione |
-|---|---|
-| `lib/` | Moduli di supporto |
-| `plugins/` | Plugin e funzionalità del bot |
-| `handler.js` | Gestione dei messaggi |
-| `hrs.js` | Connessione e avvio del bot |
-| `config.js.example` | Modello della configurazione |
-| `package.json` | Dipendenze e script |
+La struttura può cambiare con l'evoluzione del progetto. I plugin sono caricati ricorsivamente dalle sottocartelle di `plugins/`.
 
-La struttura può evolvere nel corso dello sviluppo.
+## Architettura
 
-## 08. Architettura
-
-Il funzionamento generale può essere rappresentato così:
+Il flusso essenziale del bot è rappresentato qui sotto:
 
 ```mermaid
 flowchart TD
-    A["WhatsApp"] --> B["HrsBot"]
-    B --> C["Gestione messaggi"]
-    C --> D["Sistema plugin"]
-    B --> E["Configurazione"]
-    B --> F["Sessione"]
-    C --> G["Database"]
-
-    style A fill:#F4F3F0,stroke:#747FA8,color:#303342
-    style B fill:#747FA8,stroke:#596487,color:#F4F3F0
-    style C fill:#F4F3F0,stroke:#747FA8,color:#303342
-    style D fill:#E8EAF3,stroke:#747FA8,color:#303342
-    style E fill:#E8EAF3,stroke:#747FA8,color:#303342
-    style F fill:#E8EAF3,stroke:#747FA8,color:#303342
-    style G fill:#E8EAF3,stroke:#747FA8,color:#303342
+    WA["WhatsApp"] --> BOT["HrsBot"]
+    BOT --> MSG["Gestione messaggi"]
+    MSG --> PLUGINS["Sistema plugin"]
+    BOT --> CONFIG["Configurazione locale"]
+    BOT --> SESSION["Sessione WhatsApp"]
+    MSG --> DB["Database"]
 ```
 
-## 09. File locali
+## Dati locali e sicurezza
 
-Durante l'esecuzione, HrsBot può utilizzare diversi file e cartelle locali:
+Durante l'esecuzione, HrsBot può creare o utilizzare file locali, tra cui:
 
 | Percorso | Utilizzo |
-|---|---|
+| --- | --- |
 | `config.js` | Configurazione personale |
-| `session/` | Autenticazione WhatsApp |
-| `database.json` | Dati persistenti |
-| `temp/` | File temporanei |
-| `tmp/` | File temporanei |
+| `session/` | Dati di autenticazione WhatsApp |
+| `database.json` | Dati persistenti del bot |
+| `temp/` e `tmp/` | File temporanei |
 
-Questi dati devono rimanere locali e non devono essere pubblicati se contengono informazioni personali o sensibili.
+Questi file possono contenere dati personali o di autenticazione. Non inserirli nel repository e non condividerli pubblicamente.
 
-## 10. Sicurezza
-
-- Non condividere la cartella `session/`.
-- Mantieni privato il file `config.js`.
-- Non condividere QR code o codici di collegamento.
-- Controlla il codice dei plugin prima di eseguirli.
+- Mantieni privati `config.js` e `session/`.
+- Non condividere QR code, codici di collegamento o credenziali.
+- Controlla i plugin prima di eseguirli, in particolare quelli che modificano gruppi o messaggi.
 - Utilizza soltanto account WhatsApp che sei autorizzato a collegare.
+- Ricorda che Baileys è una libreria di terze parti non ufficiale: modifiche a WhatsApp possono interrompere il funzionamento.
 
-HrsBot utilizza una libreria di terze parti non ufficiale. Eventuali modifiche ai sistemi WhatsApp potrebbero influire sul funzionamento del progetto.
+## Risoluzione dei problemi
 
-## 11. Stato del progetto
+**Il bot chiede di collegare nuovamente WhatsApp**
 
-<details>
-<summary><strong>Beta — In sviluppo</strong></summary>
+Controlla che la cartella `session/` esista e che il dispositivo sia ancora collegato nelle impostazioni di WhatsApp. Non eliminare la sessione, a meno che tu non voglia effettuare di nuovo il collegamento.
 
-HrsBot è un progetto in evoluzione.
+**Un plugin non viene caricato**
 
-Le funzionalità, i plugin e la configurazione possono cambiare nel tempo. Potrebbero essere presenti bug o comportamenti non ancora definitivi.
+Controlla gli errori nel terminale e verifica che il plugin esporti l'handler nel formato previsto dal progetto.
 
-</details>
+**La connessione fallisce o si riavvia**
+
+Verifica la connessione a Internet, la versione di Node.js e gli errori riportati nel terminale. La compatibilità con WhatsApp Web può cambiare indipendentemente dal progetto.
+
+## Stato del progetto
+
+![Beta](https://img.shields.io/badge/Development-Beta-747FA8?style=flat-square&labelColor=303342)
+
+HrsBot è in sviluppo. Funzionalità e interfacce possono cambiare e potrebbero essere presenti bug.
 
 ## Licenza
 
-La pubblicazione del repository non implica automaticamente una licenza di utilizzo, modifica o ridistribuzione.
-
-Per eventuali autorizzazioni al riutilizzo, fare riferimento alla licenza del progetto, se presente.
+Il repository attualmente non concede una licenza di riutilizzo. La disponibilità pubblica del codice non implica automaticamente il permesso di copiarlo, modificarlo o ridistribuirlo.
 
 ---
 
@@ -216,6 +201,6 @@ Per eventuali autorizzazioni al riutilizzo, fare riferimento alla licenza del pr
 
 **HrsBot.**
 
-<sub>JavaScript · WhatsApp · Modular Architecture</sub>
+<sub>JavaScript · WhatsApp · Modularità</sub>
 
 </div>
