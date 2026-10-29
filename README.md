@@ -1,143 +1,176 @@
-# HRSBot
+ <div align="center">
 
-A JavaScript WhatsApp bot built on top of [`@itsliaaa/baileys`](https://www.npmjs.com/package/@itsliaaa/baileys).
+HrsBot.
 
-> **Status: beta** — expect bugs, incomplete features, and breaking changes. This project is not intended to be treated as production-ready software.
+Un bot WhatsApp. JavaScript. Una struttura modulare.
 
-## Contents
+Sito web · Repository
 
-- [What it does](#what-it-does)
-- [Requirements](#requirements)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Linking WhatsApp](#linking-whatsapp)
-- [Running the bot](#running-the-bot)
-- [Included plugins](#included-plugins)
-- [Data and session storage](#data-and-session-storage)
-- [Security notes](#security-notes)
-- [Troubleshooting](#troubleshooting)
-- [License](#license)
+</div>
 
-## What it does
+⸻
 
-HRSBot provides a plugin-based structure for WhatsApp automation. It currently includes a small set of administration, information, and owner utilities.
+01 — Introduzione
 
-The project is in active development. Commands, plugin interfaces, and connection behavior may change between beta releases.
+HrsBot è un bot WhatsApp scritto in JavaScript, basato sulla libreria @itsliaaa/baileys.
 
-## Requirements
+Il progetto utilizza un sistema a plugin per organizzare le funzionalità in moduli distinti, mantenendo il codice estendibile e più semplice da gestire.
 
-- Linux, macOS, or another environment supported by the project dependencies
-- Node.js 20 or newer
-- npm
-- A WhatsApp account that you are allowed to link to the bot
+HrsBot è attualmente in beta. Il codice è in evoluzione e potrebbero verificarsi bug, modifiche incompatibili o interruzioni del servizio.
 
-Use a supported, up-to-date Node.js release. The underlying WhatsApp library is a third-party project; compatibility with WhatsApp Web is not guaranteed.
+02 — Caratteristiche
 
-## Installation
+* Architettura modulare — funzionalità organizzate in plugin separati.
+* Caricamento dinamico — i plugin vengono individuati nelle sottocartelle dedicate.
+* Ricaricamento durante lo sviluppo — le modifiche ai plugin JavaScript possono essere rilevate senza riavviare manualmente il processo.
+* Collegamento flessibile — autenticazione tramite QR code oppure codice di collegamento.
+* Configurazione locale — le impostazioni personali sono separate dal codice pubblico.
 
-Clone the repository and install its dependencies:
+Le funzionalità effettivamente disponibili dipendono dalla versione installata e dai plugin presenti.
 
-```sh
+03 — Requisiti
+
+Prima di iniziare, assicurati di avere:
+
+Requisito	Descrizione
+Node.js	Versione 20 o superiore
+npm	Incluso normalmente con Node.js
+Git	Per clonare il repository
+WhatsApp	Un account che sei autorizzato a collegare
+
+* Scarica Node.js
+* Installa Git
+
+04 — Installazione
+
+Clona il repository e installa le dipendenze:
+
 git clone https://github.com/invulnerabile/hrsbot.git
 cd hrsbot
 npm install
-```
 
-Create your local configuration from the example:
+Crea la configurazione locale partendo dal modello:
 
-```sh
 cp config.js.example config.js
-```
 
-The example file is a template. The bot imports `config.js` at startup, so this file must exist before running the bot.
+Su Windows, copia config.js.example e rinomina la copia in config.js.
 
-## Configuration
+05 — Configurazione
 
-Open `config.js` and edit the owner and command prefix settings.
+Apri config.js e imposta il proprietario del bot e il prefisso dei comandi.
 
-Example:
+Esempio:
 
-```js
 global.owner = [
-  ['393xxxxxxxxx', 'owner', true]
+  ['39XXXXXXXXXX', 'owner', true]
 ];
-
 global.prefix = ['.'];
-```
 
-Replace the sample number with the WhatsApp number to be treated as the bot owner. Use the international country code and digits only: do not include a leading `+`, spaces, or punctuation. Replace `owner` with the display name you want to use.
+Sostituisci 39XXXXXXXXXX con il numero corretto, comprensivo del prefisso internazionale e senza +, spazi o simboli.
 
-`global.prefix` is an array, so you can configure one or more command prefixes. The example uses `.`.
+Il prefisso dell’esempio è .; puoi modificarlo in base alla configurazione del progetto.
 
-Keep your real `config.js` private. Only `config.js.example` is intended to be committed.
+Importante: non pubblicare il tuo config.js e non inserire credenziali personali nel repository. Il file config.js.example serve come modello, non come configurazione definitiva.
 
-## Linking WhatsApp
+06 — Collegamento a WhatsApp
 
-On the first launch, if no saved session is found, HRSBot asks how you want to link the account:
+Avvia il bot dalla cartella del progetto:
 
-- **QR code:** choose `1`, then scan the QR code from WhatsApp.
-- **Pairing code:** choose `2`, enter the phone number with its country code and digits only, then follow the instructions printed in the terminal.
-
-In WhatsApp, open **Settings → Linked devices → Link a device**. Complete the process using the QR code or pairing-code flow shown by the bot.
-
-Treat QR codes and pairing codes as credentials: anyone who obtains them during the linking window may be able to link a device to your account.
-
-## Running the bot
-
-Start HRSBot from the project directory:
-
-```sh
 npm start
-```
 
-The launcher starts `hrs.js` and restarts the child process after an unexpected non-zero exit. Stop the bot with `Ctrl+C`.
+Al primo avvio, se non esiste già una sessione salvata, scegli il metodo di collegamento nel terminale.
 
-## Included plugins
+QR code
 
-Plugins are loaded recursively from `plugins/`. A plugin can export a default handler, and the running process watches the plugin directory for JavaScript changes.
+1. Seleziona 1.
+2. Apri WhatsApp.
+3. Vai su Dispositivi collegati → Collega un dispositivo.
+4. Scansiona il QR code mostrato dal bot.
 
-Current plugin files:
+Codice di collegamento
 
-| Path | Purpose |
-| --- | --- |
-| `plugins/admin/delete.js` | Administration command |
-| `plugins/admin/demote.js` | Administration command |
-| `plugins/admin/hidetag.js` | Administration command |
-| `plugins/admin/promote.js` | Administration command |
-| `plugins/info/ping.js` | Information command |
-| `plugins/owner/deletesession.js` | Owner utility |
+1. Seleziona 2.
+2. Inserisci il numero con prefisso internazionale.
+3. Segui le istruzioni mostrate nel terminale e completa il collegamento da WhatsApp.
 
-Plugin behavior and permissions depend on each plugin's implementation. Review a plugin before enabling it, especially if it can change group settings, remove messages, or affect the login session.
+Dopo l’autenticazione, i dati della sessione vengono conservati localmente. Non condividere mai QR code, codici di collegamento o file di autenticazione.
 
-## Data and session storage
+Per interrompere il processo, usa Ctrl + C nel terminale.
 
-HRSBot uses local files at runtime:
+07 — Struttura del progetto
 
-- `session/` stores WhatsApp authentication data.
-- `database.json` stores bot data managed through `lowdb`.
-- `temp/` and `tmp/` are reserved for temporary files when used.
+La struttura principale è organizzata attorno al processo di avvio, alla gestione dei messaggi e ai plugin.
 
-These files are local runtime state, not source files. Back them up securely if needed, but never commit or share the WhatsApp session. The repository's `.gitignore` excludes the private configuration, session, database, dependencies, and temporary directories.
+hrsbot/
+├── lib/                 # Moduli di supporto
+├── plugins/             # Funzionalità modulari
+├── config.js.example    # Modello di configurazione
+├── handler.js           # Gestione dei messaggi
+├── hrs.js               # Connessione e logica del bot
+├── index.js              # Avvio del processo
+├── package.json          # Dipendenze e script
+└── README.md
 
-## Security notes
+Flusso generale
 
-- Never publish `config.js`, `session/`, pairing codes, QR codes, or authentication credentials.
-- Do not run the bot using a WhatsApp account you do not own or have permission to use.
-- Review third-party code and plugins before running them.
-- Keep Node.js and npm dependencies updated, and inspect dependency changes before upgrading.
-- This project uses an unofficial third-party WhatsApp library. Changes to WhatsApp may cause disconnections or break functionality.
+flowchart TD
+    A["WhatsApp"] --> B["HrsBot"]
+    B --> C["Gestione messaggi"]
+    C --> D["Sistema a plugin"]
+    B --> E["Configurazione locale"]
+    B --> F["Sessione"]
+    C --> G["Database"]
+    style A fill:#F4F3F0,stroke:#747FA8,color:#303342
+    style B fill:#747FA8,stroke:#596487,color:#F4F3F0
+    style C fill:#F4F3F0,stroke:#747FA8,color:#303342
+    style D fill:#E8EAF3,stroke:#747FA8,color:#303342
+    style E fill:#E8EAF3,stroke:#747FA8,color:#303342
+    style F fill:#E8EAF3,stroke:#747FA8,color:#303342
+    style G fill:#E8EAF3,stroke:#747FA8,color:#303342
 
-## Troubleshooting
+I plugin JavaScript vengono caricati ricorsivamente dalle sottocartelle di plugins/. La struttura può cambiare durante lo sviluppo.
 
-**The bot asks me to link WhatsApp again.**
-Check whether `session/` exists and whether the account is still linked under WhatsApp's Linked devices settings. Do not delete the session unless you intend to link the account again.
+08 — Dati locali
 
-**A plugin does not load.**
-Check the terminal output for an import error and confirm that the plugin exports its handler as the default export.
+Durante l’esecuzione, il bot utilizza file e cartelle locali per conservare le impostazioni e lo stato operativo.
 
-**The connection fails or repeatedly reconnects.**
-Confirm that the server has internet access and that your installed Node.js version is supported by the dependencies. WhatsApp Web compatibility can change independently of this project.
+Percorso	Utilizzo
+config.js	Configurazione personale
+session/	Dati di autenticazione WhatsApp
+database.json	Dati persistenti del bot
+temp/ e tmp/	File temporanei
 
-## License
+Questi file non sono necessari per documentare il codice sorgente e devono rimanere esclusi dalle pubblicazioni quando contengono dati personali o di sessione.
 
-No reuse license has been granted at this stage. Until a license is added to the repository, do not assume that public access grants permission to copy, modify, redistribute, or use this code.
+09 — Sicurezza
+
+* Mantieni privati config.js e la cartella session/.
+* Non condividere codici QR, codici di collegamento o credenziali.
+* Controlla i plugin prima di eseguirli.
+* Utilizza soltanto account e gruppi per i quali disponi delle necessarie autorizzazioni.
+* Considera che una libreria non ufficiale può smettere di funzionare quando WhatsApp modifica i propri sistemi.
+
+10 — Stato del progetto
+
+<details>
+<summary>Beta · Informazioni sullo sviluppo</summary>
+
+HrsBot è un progetto in sviluppo. Le funzionalità, la configurazione e il comportamento dei plugin possono cambiare senza preavviso.
+
+Non è consigliato considerarlo un software stabile o pronto per ambienti di produzione.
+
+</details>
+
+Licenza
+
+Al momento non è indicata una licenza che autorizzi il riutilizzo del codice. La disponibilità pubblica del repository non concede automaticamente il diritto di copiare, modificare o ridistribuire il progetto.
+
+⸻
+
+<div align="center">
+
+HrsBot · JavaScript · WhatsApp
+
+Un progetto in evoluzione.
+
+</div>

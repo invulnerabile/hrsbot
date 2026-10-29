@@ -48,10 +48,10 @@ const handler = async (m, { conn, args }) => {
   return invia(`⚠️ @${target.split('@')[0]} 𝐡𝐚 𝐫𝐢𝐜𝐞𝐯𝐮𝐭𝐨 𝐮𝐧 𝐰𝐚𝐫𝐧.\n𝐌𝐨𝐭𝐢𝐯𝐨: ${motivo}\n𝐖𝐚𝐫𝐧: ${count}/${SOGLIA}`, [target])
 }
 
-handler.help = ['warn <@|risposta|numero> [motivo]']
+handler.help = ['warn @utente motivo']
 handler.tags = ['admin']
 handler.command = ['warn', 'ammonisci']
-handler.admin = true
+handler.mod = true
 handler.botAdmin = true
 handler.group = true
 

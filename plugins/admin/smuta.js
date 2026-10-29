@@ -39,10 +39,10 @@ const handler = async (m, { conn, args }) => {
   }, { quoted: fakeQuote('Smuta') })
 }
 
-handler.help = ['smuta <@|risposta|numero>']
+handler.help = ['smuta @utente']
 handler.tags = ['admin']
 handler.command = ['smuta']
-handler.admin = true
+handler.mod = true
 handler.group = true
 
 export default handler

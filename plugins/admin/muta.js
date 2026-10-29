@@ -41,10 +41,10 @@ const handler = async (m, { conn, args }) => {
   }, { quoted: fakeQuote('Muta') })
 }
 
-handler.help = ['muta <@|risposta|numero>']
+handler.help = ['muta @utente']
 handler.tags = ['admin']
 handler.command = ['muta']
-handler.admin = true
+handler.mod = true
 handler.botAdmin = true
 handler.group = true
 

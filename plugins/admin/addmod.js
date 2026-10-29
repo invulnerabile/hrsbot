@@ -35,7 +35,7 @@ const handler = async (m, { conn, args }) => {
   return invia(`🛡️ @${target.split('@')[0]} 𝐚𝐠𝐠𝐢𝐮𝐧𝐭𝐨 𝐜𝐨𝐦𝐞 𝐦𝐨𝐝𝐞𝐫𝐚𝐭𝐨𝐫𝐞.`, [target])
 }
 
-handler.help = ['addmod <@|risposta|numero>']
+handler.help = ['addmod @utente']
 handler.tags = ['admin']
 handler.command = ['addmod']
 handler.admin = true

@@ -20,7 +20,7 @@ const handler = async (m, { conn }) => {
 handler.help = ['del'];
 handler.tags = ['admin'];
 handler.command = ['del', 'delete'];
-handler.admin = true;
+handler.mod = true;
 handler.botAdmin = true;
 handler.group = true;
 

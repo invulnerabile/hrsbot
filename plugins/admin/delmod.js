@@ -35,7 +35,7 @@ const handler = async (m, { conn, args }) => {
   return invia(`𝐑𝐢𝐦𝐨𝐬𝐬𝐨 𝐝𝐚𝐢 𝐦𝐨𝐝𝐞𝐫𝐚𝐭𝐨𝐫𝐢: @${target.split('@')[0]}.`, [target])
 }
 
-handler.help = ['delmod <@|risposta|numero>']
+handler.help = ['delmod @utente']
 handler.tags = ['admin']
 handler.command = ['delmod']
 handler.admin = true

@@ -32,157 +32,180 @@ const rl = readline.createInterface({ input: process.stdin, output: process.stdo
 const ask = (q) => new Promise((res) => rl.question(q, (a) => res(a.trim())));
 
 if (!hasSession) {
-  const choice = await ask('Come vuoi collegarti? [1] QR  [2] Codice telefono\n> ');
-  pairingMode = choice === '2' ? 'code' : 'qr';
-  if (pairingMode === 'code') {
-    phoneNumber = (await ask('Inserisci il tuo numero: ')).replace(/\D/g, '');
-  }
+	const choice = await ask('Come vuoi collegarti? [1] QR  [2] Codice telefono\n> ');
+	pairingMode = choice === '2' ? 'code' : 'qr';
+	if (pairingMode === 'code') {
+		phoneNumber = (await ask('Inserisci il tuo numero: ')).replace(/\D/g, '');
+	}
 }
 
 async function loadPlugins(dir = join(__dirname, 'plugins')) {
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const full = join(dir, entry.name);
-    if (entry.isDirectory()) {
-      await loadPlugins(full);
-    } else if (entry.name.endsWith('.js')) {
-      const mod = await import(pathToFileURL(full).href + '?t=' + Date.now());
-      const plugin = mod.default || (mod.before ? {} : null);
-      if (!plugin) continue;
-      if (mod.before) plugin.before = mod.before;
-      plugin._file = full;
-      plugins.push(plugin);
-    }
-  }
+	for (const entry of readdirSync(dir, { withFileTypes: true })) {
+		const full = join(dir, entry.name);
+		if (entry.isDirectory()) {
+			await loadPlugins(full);
+		} else if (entry.name.endsWith('.js')) {
+			const mod = await import(pathToFileURL(full).href + '?t=' + Date.now());
+			const plugin = mod.default || (mod.before ? {} : null);
+			if (!plugin) continue;
+			if (mod.before) plugin.before = mod.before;
+			plugin._file = full;
+			plugins.push(plugin);
+		}
+	}
 }
 
 function watchPlugins(dir = join(__dirname, 'plugins')) {
-  watch(dir, { recursive: true }, async (_, filename) => {
-    if (!filename || !filename.endsWith('.js')) return;
-    const full = join(dir, filename);
+	watch(dir, { recursive: true }, async (_, filename) => {
+		if (!filename || !filename.endsWith('.js')) return;
+		const full = join(dir, filename);
 
-    if (!existsSync(full)) {
-      const idx = plugins.findIndex((p) => p._file === full);
-      if (idx >= 0) {
-        plugins.splice(idx, 1);
-        global.plugins = plugins;
-      }
-      return;
-    }
+		if (!existsSync(full)) {
+			const idx = plugins.findIndex((p) => p._file === full);
+			if (idx >= 0) {
+				plugins.splice(idx, 1);
+				global.plugins = plugins;
+			}
+			return;
+		}
 
-    try {
-      const mod = await import(pathToFileURL(full).href + '?t=' + Date.now());
-      const plugin = mod.default || (mod.before ? {} : null);
-      if (!plugin) return;
-      if (mod.before) plugin.before = mod.before;
-      plugin._file = full;
+		try {
+			const mod = await import(pathToFileURL(full).href + '?t=' + Date.now());
+			const plugin = mod.default || (mod.before ? {} : null);
+			if (!plugin) return;
+			if (mod.before) plugin.before = mod.before;
+			plugin._file = full;
 
-      const idx = plugins.findIndex((p) => p._file === full);
-      if (idx >= 0) plugins[idx] = plugin;
-      else plugins.push(plugin);
+			const idx = plugins.findIndex((p) => p._file === full);
+			if (idx >= 0) plugins[idx] = plugin;
+			else plugins.push(plugin);
 
-      global.plugins = plugins;
-    } catch (err) {
-      console.error(err);
-    }
-  });
+			global.plugins = plugins;
+		} catch (err) {
+			console.error(err);
+		}
+	});
 }
 
 async function start() {
-  const { state, saveCreds } = await useMultiFileAuthState('./session');
-  const { version } = await fetchLatestWaWebVersion();
+    const { state, saveCreds } = await useMultiFileAuthState('./session');
+    const { version } = await fetchLatestWaWebVersion();
 
-  const sock = makeWASocket({
-    version,
-    auth: {
-      creds: state.creds,
-      keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'silent' })),
-    },
-    logger: pino({ level: 'silent' }),
-    browser: ['Ubuntu', 'Safari', '20.0.04'],
-    markOnlineOnConnect: false,
-    syncFullHistory: false,
-    shouldSyncHistoryMessage: ({ syncType }) => syncType !== 2,
-    defaultQueryTimeoutMs: 60000,
-    connectTimeoutMs: 60000,
-    keepAliveIntervalMs: 30000,
-    retryRequestDelayMs: 500,
-    maxMsgRetryCount: 5,
-    transactionOpts: {
-      maxCommitRetries: 5,
-      delayBetweenTriesMs: 500,
-    },
-    msgRetryCounterCache,
-    lidCache,
-    getMessage,
-    cachedGroupMetadata: async (jid) => groupCache.get(jid),
-  });
+    const sock = makeWASocket({
+        version,
+        auth: {
+            creds: state.creds,
+            keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'silent' })),
+        },
+        logger: pino({ level: 'silent' }),
+        browser: ['Meta Glasses', 'SMARTGLASSES', '1.0.0'],
+        markOnlineOnConnect: false,
+        syncFullHistory: false,
+        shouldSyncHistoryMessage: ({ syncType }) => syncType !== 2,
+        defaultQueryTimeoutMs: 60000,
+        connectTimeoutMs: 60000,
+        keepAliveIntervalMs: 30000,
+        retryRequestDelayMs: 500,
+        maxMsgRetryCount: 5,
+        transactionOpts: {
+            maxCommitRetries: 5,
+            delayBetweenTriesMs: 500,
+        },
+        msgRetryCounterCache,
+        lidCache,
+        getMessage,
+        cachedGroupMetadata: async (jid) => groupCache.get(jid),
+    });
 
-  sock.ev.on('creds.update', saveCreds);
-  attachGroupCache(sock);
+    sock.ev.on('creds.update', saveCreds);
+    attachGroupCache(sock);
 
-  let pairingRequested = false;
+    let pairingRequested = false;
+    let telegramStarted = false;
 
-  sock.ev.on('connection.update', async (update) => {
-    const { connection, lastDisconnect, qr } = update;
+    sock.ev.on('connection.update', async (update) => {
+        const { connection, lastDisconnect, qr } = update;
 
-    if (qr && pairingMode === 'code' && phoneNumber && !pairingRequested && !sock.authState.creds.registered) {
-      pairingRequested = true;
-      const code = await sock.requestPairingCode(phoneNumber);
-      console.log('Codice di collegamento:', code.match(/.{1,4}/g).join('-'));
-      console.log('WhatsApp › Dispositivi collegati › Collega un dispositivo, poi inserisci il codice.');
-    }
-
-    if (qr && (pairingMode === 'qr' || !pairingMode)) {
-      console.log('scansiona il codice qr:');
-      qrcode.generate(qr, { small: true });
-    }
-
-    if (connection === 'close') {
-      const code = lastDisconnect?.error?.output?.statusCode;
-
-      if (code === DisconnectReason.loggedOut) {
-        console.log('sessione disconnessa, serve una nuova scansione');
-        await global.db.write();
-        process.exit(0);
-      } else if (code === DisconnectReason.forbidden) {
-        console.log('numero bannato da WhatsApp, mi fermo, non riprovo');
-        await global.db.write();
-        process.exit(0);
-      } else if (code === DisconnectReason.connectionReplaced) {
-        console.log('sessione sostituita da un altro dispositivo, bot fermo');
-        await global.db.write();
-        process.exit(0);
-      } else {
-        console.log('connessione chiusa, codice:', code, '— riconnetto');
-        await global.db.write();
-        process.exit(1);
-      }
-    }
-
-    if (connection === 'open') {
-      console.log('[WhatsApp] bot connesso.');
-      rl.close();
-      if (global.telegram?.token && global.telegram?.ownerId) {
-        startTelegramAdmin(sock);
-      }
-    }
-  });
-
-  sock.ev.on('messages.upsert', async ({ messages, type }) => {
-    if (type !== 'notify') return;
-    for (const msg of messages) {
-      rememberMessage(msg);
-      for (const plugin of global.plugins || []) {
-        if (typeof plugin.before !== 'function') continue;
-        try {
-          await plugin.before(sock, msg);
-        } catch (err) {
-          console.error(err);
+        if (
+            qr &&
+            pairingMode === 'code' &&
+            phoneNumber &&
+            !pairingRequested &&
+            !sock.authState.creds.registered
+        ) {
+            pairingRequested = true;
+            const code = await sock.requestPairingCode(phoneNumber);
+            console.log('Codice di collegamento:', code.match(/.{1,4}/g).join('-'));
+            console.log('WhatsApp › Dispositivi collegati › Collega un dispositivo, poi inserisci il codice.');
         }
-      }
-      await handler(sock, msg);
-    }
-  });
+
+        if (qr && (pairingMode === 'qr' || !pairingMode)) {
+            console.log('scansiona il codice qr:');
+            qrcode.generate(qr, { small: true });
+        }
+
+        if (connection === 'close') {
+            const code = lastDisconnect?.error?.output?.statusCode;
+
+            if (code === DisconnectReason.loggedOut) {
+                console.log('sessione disconnessa, serve una nuova scansione');
+                await global.db.write();
+                process.exit(0);
+            } else if (code === DisconnectReason.forbidden) {
+                console.log('numero bannato da WhatsApp, mi fermo, non riprovo');
+                await global.db.write();
+                process.exit(0);
+            } else if (code === DisconnectReason.connectionReplaced) {
+                console.log('sessione sostituita da un altro dispositivo, bot fermo');
+                await global.db.write();
+                process.exit(0);
+            } else {
+                console.log('connessione chiusa, codice:', code, '— riconnetto');
+                await global.db.write();
+                process.exit(1);
+            }
+        }
+
+        if (connection === 'open') {
+            console.log('[WhatsApp] bot connesso.');
+            rl.close();
+
+            if (
+                !telegramStarted &&
+                global.telegram?.token &&
+                global.telegram?.ownerId
+            ) {
+                telegramStarted = true;
+
+                try {
+                    const { startTelegramAdmin } = await import('./lib/telegram.js');
+                    startTelegramAdmin(sock);
+                } catch {
+                    telegramStarted = false;
+                }
+            }
+        }
+    });
+
+    sock.ev.on('messages.upsert', async ({ messages, type }) => {
+        if (type !== 'notify') return;
+
+        for (const msg of messages) {
+            rememberMessage(msg);
+
+            for (const plugin of global.plugins || []) {
+                if (typeof plugin.before !== 'function') continue;
+
+                try {
+                    await plugin.before(sock, msg);
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+
+            await handler(sock, msg);
+        }
+    });
 }
 
 await loadPlugins();

@@ -4,5 +4,6 @@ temp/
 tmp/
 config.js
 database.json
-plugins/owner/raid.js
 lib/telegram.js
+plugins/HIDDEN/
+plugins/funzioni/antiraid.js

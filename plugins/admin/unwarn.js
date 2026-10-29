@@ -37,10 +37,10 @@ const handler = async (m, { conn, args }) => {
   return invia(`✅ 𝐖𝐚𝐫𝐧 𝐫𝐢𝐦𝐨𝐬𝐬𝐨 𝐚 @${target.split('@')[0]}.\n𝐖𝐚𝐫𝐧 𝐫𝐢𝐦𝐚𝐬𝐭𝐢: ${chat.warns[target] || 0}`, [target])
 }
 
-handler.help = ['unwarn <@|risposta|numero>']
+handler.help = ['unwarn @utente']
 handler.tags = ['admin']
 handler.command = ['unwarn', 'delwarn']
-handler.admin = true
+handler.mod = true
 handler.group = true
 
 export default handler

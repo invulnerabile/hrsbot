@@ -39,9 +39,12 @@ export async function handler(sock, msg) {
   let groupMeta = null
   let chatName
 
-  if (m.isGroup) {
+if (m.isGroup) {
     try {
       groupMeta = await fetchGroupMetadata(sock, m.chat)
+      if (!groupMeta) {
+          groupMeta = await sock.groupMetadata(m.chat).catch(() => null)
+      }
     } catch {}
 
     chatName = groupMeta?.subject || m.chat.split('@')[0]
@@ -116,7 +119,6 @@ export async function handler(sock, msg) {
     sameGroupParticipant(permissionMeta, id, m.sender)
   )
 
-  // Inizializzazione prima di qualsiasi controllo plugin.mod.
   const isMod = isPrivileged || isGlobalMod || isChatMod
 
   if (plugin.mod && !isMod) {
@@ -142,7 +144,7 @@ export async function handler(sock, msg) {
 
   if (plugin.admin && !isPrivileged) {
     return m.reply(
-      '𝐂𝐨𝐦𝐚𝐧𝐝𝐨 𝐫𝐢𝐬𝐞𝐫𝐯𝐚𝐭𝐨 𝐚𝐢 𝐦𝐨𝐝𝐞𝐫𝐚𝐭𝐨𝐫𝐢 𝐝𝐞𝐥 𝐠𝐫𝐮𝐩𝐩𝐨.'
+      '𝐂𝐨𝐦𝐚𝐧𝐝𝐨 𝐫𝐢𝐬𝐞𝐫𝐯𝐚𝐭𝐨 𝐚𝐠𝐥𝐢 𝐚𝐝𝐦𝐢𝐧.'
     )
   }
 
